@@ -3,22 +3,34 @@ import { createGrpcWebTransport } from "@connectrpc/connect-web";
 import { CallbackClient, createCallbackClient } from "@connectrpc/connect";
 import { Entity } from "@anduril-industries/lattice-sdk/src/anduril/entitymanager/v1/entity.pub_pb";
 
+const BEARER_TOKEN = "";
+const BASE_URL = "";
 export class EntityStore {
 
     private connection : CallbackClient<typeof EntityManagerAPI>;
-    private baseUrl = "https://lonestar.anduril.com";
     private entities : Map<string, Entity>;
 
     constructor() {
+        if (!BASE_URL || !BEARER_TOKEN) {
+            throw new Error("Error starting application, base url or bearer token not set");
+        }
+
         this.connection = createCallbackClient(EntityManagerAPI, createGrpcWebTransport({
-            baseUrl: this.baseUrl,
-        }));
-        
-        const headers = new Headers();
-        headers.set("Authorization", "Bearer eyJhbGciOiJIUzI1NiJ9.eyJleHAiOjE3MzM4ODA1MjYsImlzcyI6ImFuZHVyaWwiLCJqdGkiOiIzYTZmMWNlMC02OWJkLTQzYjMtOThkNi0yNGI4YTkxY2IyMGIiLCJuYmYiOjE3MzMyNzU3MTYsInN1YiI6InVzZXIvOWY5NjVlNGMtMzNjNi00ZTAwLThlOWEtYzdmZDUwNTc3OGU1In0.Cxj4cBP2rXbKl_M42BFZQD_rJU8k9xpEL2Od3JiB0no");
-
+            baseUrl: BASE_URL,
+        }));     
         this.entities = new Map();
+        this.streamEntities();
+    }
 
+    private streamEntities() {
+        const headers = new Headers();
+        headers.set("Authorization", `Bearer ${BEARER_TOKEN}`);
+
+        /*  
+            Stream all entities, asking for all components to be set. Please visit 
+            https://docs.anduril.com/guide/entity/watch#stream-entities for additional information
+            on streaming entities
+        */
         this.connection.streamEntityComponents({ includeAllComponents: true}, (res : StreamEntityComponentsResponse) => {
             const entity = res.entityEvent?.entity;
 
@@ -26,6 +38,7 @@ export class EntityStore {
                 return;
             }
 
+            // We replace the entity in the map if it's one of the following types and delete it if it's expired.
             switch (res.entityEvent?.eventType) {
                 case EventType.PREEXISTING || EventType.CREATED || EventType.UPDATE:
                     this.entities.set(entity.entityId, entity);
