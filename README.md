@@ -30,15 +30,14 @@ cd sample-app-entity-map-visualizer
 
 ### Edit variables
 
-You now need to provide the sample application with the endpoint to get data from. In `src/EntityStore.ts` please edit the variables with the base URL and bearer token to use. 
+You now need to provide the sample application with the endpoint to get data from. To do so please create a `.env` file at the root of this project folder and populate it with:
 
-Please contact your Anduril representative if you need assistance with these values.
-
-```ts
-const BEARER_TOKEN = "";
-const BASE_URL = "";
+```bash
+VITE_BEARER_TOKEN=""
+VITE_BASE_URL=""
 ```
 
+Please contact your Anduril representative if you need assistance with populating these values.
 
 ### Run the application
 

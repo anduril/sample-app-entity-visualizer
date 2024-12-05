@@ -2,9 +2,8 @@ import { EntityManagerAPI, EventType, StreamEntityComponentsResponse } from "@an
 import { createGrpcWebTransport } from "@connectrpc/connect-web";
 import { CallbackClient, createCallbackClient } from "@connectrpc/connect";
 import { Entity } from "@anduril-industries/lattice-sdk/src/anduril/entitymanager/v1/entity.pub_pb";
+import { APPLICATION_CONFIG } from "./config";
 
-const BEARER_TOKEN = "";
-const BASE_URL = "";
 export class EntityStore {
 
     private connection : CallbackClient<typeof EntityManagerAPI>;
@@ -12,7 +11,7 @@ export class EntityStore {
 
     constructor() {
         this.connection = createCallbackClient(EntityManagerAPI, createGrpcWebTransport({
-            baseUrl: BASE_URL,
+            baseUrl: APPLICATION_CONFIG.BASE_URL,
         }));     
         this.entities = new Map();
         this.streamEntities();
@@ -20,7 +19,7 @@ export class EntityStore {
 
     private streamEntities() {
         const headers = new Headers();
-        headers.set("Authorization", `Bearer ${BEARER_TOKEN}`);
+        headers.set("Authorization", `Bearer ${APPLICATION_CONFIG.BEARER_TOKEN}`);
 
         /*  
             Stream all entities, asking for all components to be set. Please visit 
