@@ -35,9 +35,11 @@ export class EntityStore {
 
             // We replace the entity in the map if it's one of the following types and delete it if it's expired.
             switch (res.entityEvent?.eventType) {
-                case EventType.PREEXISTING || EventType.CREATED || EventType.UPDATE:
-                    this.entities.set(entity.entityId, entity);
-                    break;
+                case EventType.PREEXISTING:
+                case EventType.CREATED:
+                case EventType.UPDATE:
+                         this.entities.set(entity.entityId, entity);
+                         break;
                 
                 case EventType.DELETED:
                     this.entities.delete(entity.entityId);
