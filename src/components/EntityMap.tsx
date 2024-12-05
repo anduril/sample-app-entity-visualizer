@@ -40,7 +40,7 @@ export function EntityMap({ entities }: EntityMapProps) {
                 ]}
               >
                 <Tooltip>
-                  <span>{entity.aliases?.name}</span>
+                  <span>{entity.aliases?.name ?? entity.entityId}</span>
                 </Tooltip>
               </Marker>
             );
