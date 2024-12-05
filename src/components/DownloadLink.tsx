@@ -7,7 +7,7 @@ export function DownloadLink() {
         <Typography sx={{ mt: 3, mb: 3, color: "text.secondary" }}>
         <GitHub sx={{ mr: 1, verticalAlign: "middle" }} />
         {"View source code on "}
-        <Link href="https://github.com/anduril/sample-entity-map-viewer">
+        <Link href="https://github.com/anduril/sample-app-entity-visualizer">
           GitHub
         </Link>
       </Typography>

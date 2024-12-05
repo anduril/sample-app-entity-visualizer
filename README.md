@@ -1,4 +1,4 @@
-# Entity Map Visualization Tool
+# Entity Map Visualizer
 
 ![Sample App](images/app.png)
 
