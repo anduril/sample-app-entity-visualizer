@@ -11,10 +11,6 @@ export class EntityStore {
     private entities : Map<string, Entity>;
 
     constructor() {
-        if (!BASE_URL || !BEARER_TOKEN) {
-            throw new Error("Error starting application, base url or bearer token not set");
-        }
-
         this.connection = createCallbackClient(EntityManagerAPI, createGrpcWebTransport({
             baseUrl: BASE_URL,
         }));     
