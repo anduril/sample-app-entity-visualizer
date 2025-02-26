@@ -18,6 +18,7 @@ export function EntityMap({ entities }: EntityMapProps) {
       zoom={5}
       scrollWheelZoom={true}
       className="map"
+      worldCopyJump={true}
     >
       <TileLayer
         attribution={TILE_ATTRIBUTION}
