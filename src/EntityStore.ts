@@ -11,7 +11,7 @@ export class EntityStore {
 
     constructor() {
         this.connection = createCallbackClient(EntityManagerAPI, createGrpcWebTransport({
-            baseUrl: APPLICATION_CONFIG.BASE_URL,
+            baseUrl: APPLICATION_CONFIG.LATTICE_URL
         }));     
         this.entities = new Map();
         this.streamEntities();
@@ -19,7 +19,8 @@ export class EntityStore {
 
     private streamEntities() {
         const headers = new Headers();
-        headers.set("Authorization", `Bearer ${APPLICATION_CONFIG.BEARER_TOKEN}`);
+        headers.set("Authorization", `Bearer ${APPLICATION_CONFIG.ENVIRONMENT_TOKEN}`);
+        headers.set("Authorization", `Bearer ${APPLICATION_CONFIG.SANDBOX_TOKEN}`);
 
         /*  
             Stream all entities, asking for all components to be set. Please visit 

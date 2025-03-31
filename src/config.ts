@@ -1,4 +1,5 @@
 export const APPLICATION_CONFIG = {
-    BASE_URL: import.meta.env.VITE_BASE_URL,
-    BEARER_TOKEN: import.meta.env.VITE_BEARER_TOKEN,
+    LATTICE_URL: import.meta.env.LATTUCE_URL,
+    ENVIRONMENT_TOKEN: import.meta.env.ENVIRONMENT_TOKEN,
+    SANDBOX_TOKEN: import.meta.env.SANDBOX_TOKEN
 }
