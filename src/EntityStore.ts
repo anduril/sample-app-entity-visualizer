@@ -20,7 +20,7 @@ export class EntityStore {
     private streamEntities() {
         const headers = new Headers();
         headers.set("Authorization", `Bearer ${APPLICATION_CONFIG.ENVIRONMENT_TOKEN}`);
-        headers.set("Authorization", `Bearer ${APPLICATION_CONFIG.SANDBOX_TOKEN}`);
+        headers.set("Anduril-Sandbox-Authorization", `Bearer ${APPLICATION_CONFIG.SANDBOX_TOKEN}`);
 
         /*  
             Stream all entities, asking for all components to be set. Please visit 
