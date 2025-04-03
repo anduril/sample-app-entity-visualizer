@@ -11,7 +11,7 @@ export class EntityStore {
 
     constructor() {
         this.connection = createCallbackClient(EntityManagerAPI, createGrpcWebTransport({
-            baseUrl: APPLICATION_CONFIG.LATTICE_URL
+            baseUrl: `https://${APPLICATION_CONFIG.LATTICE_URL}`
         }));     
         this.entities = new Map();
         this.streamEntities();
@@ -19,8 +19,8 @@ export class EntityStore {
 
     private streamEntities() {
         const headers = new Headers();
-        headers.set("Authorization", `Bearer ${APPLICATION_CONFIG.ENVIRONMENT_TOKEN}`);
-        headers.set("Anduril-Sandbox-Authorization", `Bearer ${APPLICATION_CONFIG.SANDBOX_TOKEN}`);
+        headers.set("authorization", `Bearer ${APPLICATION_CONFIG.ENVIRONMENT_TOKEN}`);
+        headers.set("anduril-sandbox-authorization", `Bearer ${APPLICATION_CONFIG.SANDBOX_TOKEN}`);
 
         /*  
             Stream all entities, asking for all components to be set. Please visit 
@@ -29,6 +29,7 @@ export class EntityStore {
         */
         this.connection.streamEntityComponents({ includeAllComponents: true}, (res : StreamEntityComponentsResponse) => {
             const entity = res.entityEvent?.entity;
+            console.log('Entity: ', entity)
 
             if (!entity?.entityId) {
                 return;
