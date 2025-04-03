@@ -11,7 +11,7 @@ export class EntityStore {
 
     constructor() {
         this.connection = createCallbackClient(EntityManagerAPI, createGrpcWebTransport({
-            baseUrl: `https://${APPLICATION_CONFIG.LATTICE_URL}`
+            baseUrl: APPLICATION_CONFIG.LATTICE_URL,
         }));     
         this.entities = new Map();
         this.streamEntities();
