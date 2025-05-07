@@ -29,7 +29,6 @@ export class EntityStore {
         */
         this.connection.streamEntityComponents({ includeAllComponents: true}, (res : StreamEntityComponentsResponse) => {
             const entity = res.entityEvent?.entity;
-            console.log('Entity: ', entity)
 
             if (!entity?.entityId) {
                 return;
