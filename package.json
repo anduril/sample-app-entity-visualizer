@@ -10,7 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@anduril-industries/lattice-sdk": "^1.2.0",
+    "@anduril-industries/lattice-sdk": "file:/Users/vpuri/external-sdks/build/fern/sdks/typescript/index.ts",
     "@connectrpc/connect": "^2.0.0",
     "@connectrpc/connect-web": "^2.0.0",
     "@emotion/react": "^11.13.5",

@@ -1,7 +1,9 @@
-import { EntityManagerAPI, EventType, StreamEntityComponentsResponse } from "@anduril-industries/lattice-sdk/src/anduril/entitymanager/v1/entity_manager_grpcapi.pub_pb";
+// import { EntityManagerAPI, EventType, StreamEntityComponentsResponse } from "@anduril-industries/lattice-sdk/src/anduril/entitymanager/v1/entity_manager_grpcapi.pub_pb";
+import { Entity,  EntityManagerAPI, EntityEventEventType, StreamEntityComponentsResponse } from "/Users/vpuri/external-sdks/build/fern/sdks/typescript/api/types";
+
 import { createGrpcWebTransport } from "@connectrpc/connect-web";
 import { CallbackClient, createCallbackClient } from "@connectrpc/connect";
-import { Entity } from "@anduril-industries/lattice-sdk/src/anduril/entitymanager/v1/entity.pub_pb";
+// import { Entity } from "@anduril-industries/lattice-sdk/src/anduril/entitymanager/v1/entity.pub_pb";
 import { APPLICATION_CONFIG } from "./config";
 
 export class EntityStore {
@@ -36,13 +38,13 @@ export class EntityStore {
 
             // We replace the entity in the map if it's one of the following types and delete it if it's expired.
             switch (res.entityEvent?.eventType) {
-                case EventType.PREEXISTING:
-                case EventType.CREATED:
-                case EventType.UPDATE:
+                case EntityEventEventType.EventTypePreexisting:
+                case EntityEventEventType.EventTypeCreated:
+                case EntityEventEventType.EventTypeUpdate:
                          this.entities.set(entity.entityId, entity);
                          break;
                 
-                case EventType.DELETED:
+                case EntityEventEventType.EventTypeDeleted:
                     this.entities.delete(entity.entityId);
             }
         }, (err) => {
