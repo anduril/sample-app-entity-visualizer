@@ -4,7 +4,7 @@ import "react-leaflet-markercluster/dist/styles.min.css";
 
 import { EntityStore } from "./EntityStore";
 
-import { Entity } from "@anduril-industries/lattice-sdk/src/anduril/entitymanager/v1/entity.pub_pb";
+import { Entity } from "@buf/anduril_lattice-sdk.bufbuild_es/anduril/entitymanager/v1/entity.pub_pb";
 import { useEffect, useState } from "react";
 import { EntityMap } from "./components/EntityMap";
 import { Box, Container, Typography } from "@mui/material";
