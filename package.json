@@ -10,7 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@buf/anduril_lattice-sdk.bufbuild_es": "2.6.1-20250722173914-79c2dfbd4ddc.1",
+    "@buf/anduril_lattice-sdk.bufbuild_es": "^2.6.1-20250722173914-79c2dfbd4ddc.1",
     "@connectrpc/connect": "^2.0.0",
     "@connectrpc/connect-web": "^2.0.0",
     "@emotion/react": "^11.13.5",
