@@ -4,9 +4,9 @@
 
 ## Description
 
-This sample application shows how to use the Lattice gRPC SDK for Javascript to display Entity position's as markers on a map. It uses the following dependencies to achieve this:
+This web application implements a custom UI with JavaScript + [Vite](https://vite.dev/) that leverages the Lattice SDK's gRPC streaming capabilities. It uses the JavaScript types generated in the [Lattice SDK Buf Repository] alongside ConnectRPC to update simulated Entity positions on a map in real-time. 
 
-
+The project uses the following dependencies:
 * `Connect RPC` - To make the gRPC+Web requests
 * `Material UI` - For styling and basic components
 * `React` - UI Framework
@@ -28,7 +28,7 @@ git clone https://github.com/anduril/sample-app-entity-visualizer
 cd sample-app-entity-visualizer
 ```
 
-### Edit variables
+### Set variables
 
 You now need to provide the sample application with the endpoint to get data from. To do so please create a `.env` file at the root of this project folder and populate it with:
 
@@ -38,7 +38,7 @@ VITE_SANDBOX_TOKEN=""
 VITE_LATTICE_URL=""
 ```
 
-Please contact your Anduril representative if you need assistance with populating these values.
+Please contact your Anduril representative if you need assistance with populating these values or run into any authentication issues.
 
 ### Run the application
 
