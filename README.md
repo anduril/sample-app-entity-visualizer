@@ -38,6 +38,8 @@ VITE_SANDBOX_TOKEN=""
 VITE_LATTICE_URL=""
 ```
 
+For information on how to obtain these tokens, see the [Sandboxes documentation](https://developer.anduril.com/guides/getting-started/sandboxes#get-the-tokens).
+
 Please contact your Anduril representative if you need assistance with populating these values or run into any authentication issues.
 
 ### Run the application
