@@ -1,5 +1,6 @@
 export const APPLICATION_CONFIG = {
     LATTICE_URL: import.meta.env.VITE_LATTICE_URL,
-    ENVIRONMENT_TOKEN: import.meta.env.VITE_ENVIRONMENT_TOKEN,
+    CLIENT_ID: import.meta.env.VITE_LATTICE_CLIENT_ID,
+    CLIENT_SECRET: import.meta.env.VITE_LATTICE_CLIENT_SECRET,
     SANDBOX_TOKEN: import.meta.env.VITE_SANDBOX_TOKEN
 }
