@@ -51,7 +51,7 @@ export class EntityStore {
             const data = await response.json();
             this.accessToken = data.access_token;
 
-            const expirySeconds = data.expires_in || data.refresh_expires_in || 900;
+            const expirySeconds = data.expires_in || 900;
             this.tokenExpiry = Date.now() + (expirySeconds * 1000);
 
             this.scheduleTokenRefresh();
@@ -108,6 +108,7 @@ export class EntityStore {
                 on streaming entities
             */
             this.connection.streamEntityComponents({ includeAllComponents: true},
+                // Success callback
                 (res : StreamEntityComponentsResponse) => {
                     const entity = res.entityEvent?.entity;
 
