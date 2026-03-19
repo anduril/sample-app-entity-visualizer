@@ -35,6 +35,7 @@ export class EntityStore {
             const response = await fetch(tokenEndpoint, {
                 method: 'POST',
                 headers: {
+                    'Anduril-Sandbox-Authorization': `Bearer ${APPLICATION_CONFIG.SANDBOX_TOKEN}`,
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
                 body: new URLSearchParams({
