@@ -1,6 +1,6 @@
 import "./App.css";
 import "leaflet/dist/leaflet.css";
-import "react-leaflet-markercluster/dist/styles.min.css";
+import "react-leaflet-markercluster/styles";
 
 import { EntityStore } from "./EntityStore";
 
