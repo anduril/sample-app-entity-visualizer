@@ -1,5 +1,5 @@
 import { LatLng } from "leaflet";
-import { Entity } from "@anduril-industries/lattice-sdk/src/anduril/entitymanager/v1/entity.pub_pb";
+import { Entity } from "@buf/anduril_lattice-sdk.bufbuild_es/anduril/entitymanager/v1/entity.pub_pb";
 import { MapContainer, Marker, TileLayer, Tooltip } from "react-leaflet";
 import MarkerClusterGroup from "react-leaflet-markercluster";
 interface EntityMapProps {

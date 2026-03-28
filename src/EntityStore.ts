@@ -1,4 +1,4 @@
-import { EntityManagerAPI, EventType, StreamEntityComponentsResponse } from "@buf/anduril_lattice-sdk.bufbuild_es/anduril/entitymanager/v1/entity_manager_grpcapi.pub_pb";
+import { EntityManagerAPI, EventType, StreamEntityComponentsResponse } from "@buf/anduril_lattice-sdk.bufbuild_es/anduril/entitymanager/v1/entity_manager_api.pub_pb";
 import { createGrpcWebTransport } from "@connectrpc/connect-web";
 import { CallbackClient, createCallbackClient } from "@connectrpc/connect";
 import { Entity } from "@buf/anduril_lattice-sdk.bufbuild_es/anduril/entitymanager/v1/entity.pub_pb";
