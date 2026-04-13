@@ -46,7 +46,7 @@ Please contact your Anduril representative if you need assistance with populatin
 ### Run the application
 
 ```bash
-npm install
+npm ci
 npm run dev
 ```
 
