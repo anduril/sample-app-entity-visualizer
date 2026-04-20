@@ -1,0 +1,118 @@
+name: Bump Lattice SDK Buf package
+
+# Separate workflow for scheduling updates to the lattice buf package
+# since Dependabot can't resolve it
+
+on:
+  schedule:
+    - cron: "0 0 * * 1"
+  workflow_dispatch:
+  # TEMP: remove before merging to master
+  push:
+    branches: [asomera/buf-pkg-update-workflow]
+
+env:
+  GITHUB_TOKEN: ${{ secrets.EXT_GITHUB_PAT }}
+  GH_TOKEN: ${{ secrets.EXT_GITHUB_PAT }}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: bump-lattice-buf
+  cancel-in-progress: false
+
+jobs:
+  bump:
+    name: Bump Lattice SDK Buf package
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          token: ${{ secrets.EXT_GITHUB_PAT }}
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Resolve versions
+        id: check
+        run: |
+          set -euo pipefail
+
+          pkg="@buf/anduril_lattice-sdk.bufbuild_es"
+
+          extract_ts() {
+            [[ "$1" =~ -([0-9]{14})- ]] && echo "${BASH_REMATCH[1]}"
+          }
+
+          new_version=$(npm view "$pkg" version --registry "https://buf.build/gen/npm/v1/")
+          old_version=$(jq -r --arg p "$pkg" '.dependencies[$p] // .devDependencies[$p] // empty' package.json)
+          if [[ -z "$old_version" ]]; then
+            echo "::error::Package $pkg not found in package.json"
+            exit 1
+          fi
+
+          new_ts=$(extract_ts "$new_version")
+          old_ts=$(extract_ts "$old_version")
+          if [[ -z "$new_ts" || -z "$old_ts" ]]; then
+            echo "::error::Failed to extract timestamp — new=$new_version old=$old_version"
+            exit 1
+          fi
+
+          echo "Latest regen: $new_ts"
+          echo "Current regen: $old_ts"
+
+          if [[ "$new_ts" == "$old_ts" ]]; then
+            echo "needs_bump=false" >> "$GITHUB_OUTPUT"
+          else
+            {
+              echo "needs_bump=true"
+              echo "new_ts=$new_ts"
+              echo "old_ts=$old_ts"
+              echo "new_version=$new_version"
+              echo "branch=buf-updater/$new_ts"
+            } >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Check for existing PR
+        id: pr
+        if: steps.check.outputs.needs_bump == 'true'
+        run: |
+          set -euo pipefail
+          pr_number=$(gh pr list --state open \
+            --json number \
+            -H "${{ steps.check.outputs.branch }}" \
+            --jq '.[0].number // empty')
+          if [[ -n "$pr_number" ]]; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Bump and open PR
+        if: steps.check.outputs.needs_bump == 'true' && steps.pr.outputs.exists == 'false'
+        env:
+          BRANCH: ${{ steps.check.outputs.branch }}
+          NEW_TS: ${{ steps.check.outputs.new_ts }}
+          OLD_TS: ${{ steps.check.outputs.old_ts }}
+          NEW_VERSION: ${{ steps.check.outputs.new_version }}
+        run: |
+          set -euo pipefail
+
+          npm install "@buf/anduril_lattice-sdk.bufbuild_es@$NEW_VERSION"
+
+          git config --local user.email "190288625+anduril-gh-bot@users.noreply.github.com"
+          git config --local user.name  "anduril-gh-bot"
+
+          git checkout -b "$BRANCH"
+          git add package.json package-lock.json
+          git commit -m "build(deps): bump Lattice SDK Buf package to $NEW_TS"
+          git push -u --force-with-lease origin "$BRANCH"
+
+          gh pr create \
+            --base master \
+            --head "$BRANCH" \
+            --title "build(deps): bump Lattice SDK Buf package to $NEW_TS" \
+            --body "Bumps \`@buf/anduril_lattice-sdk.bufbuild_es\` from \`buf.build/gen/npm\` (regeneration \`$OLD_TS\` → \`$NEW_TS\`)."
