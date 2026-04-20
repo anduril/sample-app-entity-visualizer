@@ -7,9 +7,6 @@ on:
   schedule:
     - cron: "0 0 * * 1"
   workflow_dispatch:
-  # TEMP: remove before merging to master
-  push:
-    branches: [asomera/buf-pkg-update-workflow]
 
 env:
   GITHUB_TOKEN: ${{ secrets.EXT_GITHUB_PAT }}
