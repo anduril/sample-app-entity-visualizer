@@ -17,16 +17,26 @@ export class EntityStore {
             baseUrl: APPLICATION_CONFIG.LATTICE_URL,
         }));
         this.entities = new Map();
-        this.getAccessToken().then(() => {
-            this.streamEntities();
-        }).catch(error => {
-            console.error("Failed to get access token:", error);
-        });
+        
+        this.getAccessToken()
+            .then(this.streamEntities)
+            .catch(console.error);
     }
 
-    private async getAccessToken(retryCount: number = 0): Promise<string> {
+    private async getAccessToken(retryCount: number = 0): Promise<undefined> {
+        if (APPLICATION_CONFIG.BEARER_TOKEN) {
+            if (APPLICATION_CONFIG.CLIENT_ID || APPLICATION_CONFIG.CLIENT_SECRET) {
+                throw new Error("Bearer token auth (`BEARER_TOKEN`) and client config auth (`CLIENT_ID` + `CLIENT_SECRET`) cannot be used together. Use only one method of authentication. Learn more at https://developer.anduril.com/guides/getting-started/authenticate");
+            }
+        }
+
+        if (APPLICATION_CONFIG.BEARER_TOKEN) {
+            this.accessToken = APPLICATION_CONFIG.BEARER_TOKEN;
+            return;
+        }
+
         if (this.accessToken && Date.now() < this.tokenExpiry) {
-            return this.accessToken;
+            return;
         }
 
         try {
@@ -56,8 +66,6 @@ export class EntityStore {
             this.tokenExpiry = Date.now() + (expirySeconds * 1000);
 
             this.scheduleTokenRefresh();
-
-            return this.accessToken ? this.accessToken : "";
         } catch (error) {
             console.error(`Error obtaining access token (attempt ${retryCount + 1}):`, error);
 
@@ -98,9 +106,7 @@ export class EntityStore {
         try {
             const headers = new Headers();
 
-            // Get fresh access token
-            const token = await this.getAccessToken();
-            headers.set("authorization", `Bearer ${token}`);
+            headers.set("authorization", `Bearer ${this.accessToken}`);
             headers.set("anduril-sandbox-authorization", `Bearer ${APPLICATION_CONFIG.SANDBOX_TOKEN}`);
 
             /*
@@ -108,7 +114,9 @@ export class EntityStore {
                 https://docs.anduril.com/guide/entity/watch#stream-entities for additional information
                 on streaming entities
             */
-            this.connection.streamEntityComponents({ includeAllComponents: true},
+            this.connection.streamEntityComponents(
+                // Request options
+                { includeAllComponents: true},
                 // Success callback
                 (res : StreamEntityComponentsResponse) => {
                     const entity = res.entityEvent?.entity;
@@ -129,7 +137,7 @@ export class EntityStore {
                             this.entities.delete(entity.entityId);
                     }
                 },
-
+                // Error callback
                 async (err) => {
                     console.error("Stream error:", err);
 
@@ -147,11 +155,12 @@ export class EntityStore {
 
                         setTimeout(() => {
                             this.getAccessToken()
-                                .then(() => this.streamEntities())
+                                .then(this.streamEntities)
                                 .catch(error => console.error("Failed to reconnect:", error));
                         }, 60000); 
                     }
                 },
+                // Request headers
                 { headers: headers }
             );
         } catch (error) {
