@@ -33,11 +33,11 @@ cd sample-app-entity-visualizer
 You now need to provide the sample application with the Lattice endpoint to get data from, and credentials for it (see the [Authentication documentation](https://developer.anduril.com/guides/getting-started/authenticate)). To do so please create a `.env` file at the root of this project folder and populate it with:
 
 ```bash
-LATTICE_BEARER_TOKEN="" # Set this or `LATTICE_CLIENT_ID` and `LATTICE_CLIENT_SECRET`
-LATTICE_CLIENT_ID="" # Do not set `LATTICE_BEARER_TOKEN` if using client credentials
-LATTICE_CLIENT_SECRET="" # Do not set `LATTICE_BEARER_TOKEN` if using client credentials
-LATTICE_SANDBOX_TOKEN="" # Set when connecting to a Lattice Sandbox environment. Not required when connecting to other Lattice environments
-LATTICE_URL=""
+VITE_LATTICE_BEARER_TOKEN="" # Set this or `VITE_LATTICE_CLIENT_ID` and `VITE_LATTICE_CLIENT_SECRET`
+VITE_LATTICE_CLIENT_ID="" # Do not set `VITE_LATTICE_BEARER_TOKEN` if using client credentials
+VITE_LATTICE_CLIENT_SECRET="" # Do not set `VITE_LATTICE_BEARER_TOKEN` if using client credentials
+VITE_LATTICE_SANDBOX_TOKEN="" # Set when connecting to a Lattice Sandbox environment. Not required when connecting to other Lattice environments
+VITE_LATTICE_URL=""
 ```
 
 For information on how to obtain these credentials, see the [Sandboxes documentation](https://developer.anduril.com/guides/getting-started/sandboxes#get-the-tokens).
