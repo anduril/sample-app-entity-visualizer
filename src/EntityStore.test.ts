@@ -88,11 +88,43 @@ describe("EntityStore authentication", () => {
         expect(headersFromLastStreamCall().get("authorization")).toBe("Bearer exchanged-token");
     });
 
-    it("fails loudly and never streams when no credentials are configured", async () => {
+    it("surfaces a config error without throwing when no credentials are configured", async () => {
         vi.stubGlobal("fetch", vi.fn());
 
         const EntityStore = await importFreshStore();
-        expect(() => new EntityStore()).toThrow(/no authentication/i);
+        let store!: InstanceType<typeof EntityStore>;
+        expect(() => {
+            store = new EntityStore();
+        }).not.toThrow();
+
+        expect(store.getError()).toMatch(/no authentication/i);
         expect(streamCalls.length).toBe(0);
+    });
+
+    it("surfaces a config error without throwing when both auth methods are set", async () => {
+        vi.stubGlobal("fetch", vi.fn());
+        mockConfig.BEARER_TOKEN = "static-token";
+        mockConfig.CLIENT_ID = "id";
+        mockConfig.CLIENT_SECRET = "secret";
+
+        const EntityStore = await importFreshStore();
+        let store!: InstanceType<typeof EntityStore>;
+        expect(() => {
+            store = new EntityStore();
+        }).not.toThrow();
+
+        expect(store.getError()).toMatch(/cannot be used together/i);
+        expect(streamCalls.length).toBe(0);
+    });
+
+    it("reports no error when configured correctly", async () => {
+        vi.stubGlobal("fetch", vi.fn());
+        mockConfig.BEARER_TOKEN = "static-token";
+
+        const EntityStore = await importFreshStore();
+        const store = new EntityStore();
+        await vi.waitFor(() => expect(streamCalls.length).toBe(1));
+
+        expect(store.getError()).toBeNull();
     });
 });

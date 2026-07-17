@@ -9,10 +9,11 @@ export class EntityStore {
 
     private connection : CallbackClient<typeof EntityManagerAPI>;
     private entities : Map<string, Entity>;
-    private authConfig!: AuthConfig;
+    private authConfig: AuthConfig | null = null;
     private accessToken: string | null = null;
     private tokenExpiry: number = 0;
     private refreshTimer: ReturnType<typeof setTimeout> | null = null;
+    private error: string | null = null;
 
     constructor() {
         this.connection = createCallbackClient(EntityManagerAPI, createGrpcWebTransport({
@@ -20,18 +21,35 @@ export class EntityStore {
         }));
         this.entities = new Map();
 
-        // Validate credentials up front so misconfiguration fails loudly.
-        this.authConfig = resolveAuthConfig(APPLICATION_CONFIG);
+        // Validate credentials up front. Rather than throwing out of the
+        // constructor (which would crash the whole React app), we record the
+        // problem so the UI can surface it as a banner. See getError().
+        try {
+            this.authConfig = resolveAuthConfig(APPLICATION_CONFIG);
+        } catch (error) {
+            this.setError(error);
+            return;
+        }
 
         this.getAccessToken()
             .then(() => this.streamEntities())
-            .catch(console.error);
+            .catch((error) => this.setError(error));
+    }
+
+    private setError(error: unknown): void {
+        this.error = error instanceof Error ? error.message : String(error);
+        console.error(this.error);
+    }
+
+    /** The most recent unrecoverable error, or null if the store is healthy. */
+    getError(): string | null {
+        return this.error;
     }
 
     private async getAccessToken(retryCount: number = 0): Promise<undefined> {
         // A static bearer token is used as-is; there is no token exchange or
         // refresh. See https://developer.anduril.com/guides/getting-started/authenticate
-        if (this.authConfig.mode === "bearer") {
+        if (this.authConfig?.mode === "bearer") {
             this.accessToken = this.authConfig.token;
             return;
         }
