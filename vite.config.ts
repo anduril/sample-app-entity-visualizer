@@ -14,6 +14,10 @@ export default defineConfig(({ mode }) => {
   }
 
   return {
+    // This app reads unprefixed LATTICE_* env vars (see src/config.ts). Vite
+    // only exposes vars matching envPrefix to import.meta.env, and the default
+    // is "VITE_", so we must widen it to include "LATTICE_".
+    envPrefix: ['VITE_', 'LATTICE_'],
     server: {
       proxy
     },

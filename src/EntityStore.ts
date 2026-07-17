@@ -3,11 +3,13 @@ import { createGrpcWebTransport } from "@connectrpc/connect-web";
 import { CallbackClient, createCallbackClient } from "@connectrpc/connect";
 import { Entity } from "@buf/anduril_lattice-sdk.bufbuild_es/anduril/entitymanager/v1/entity.pub_pb";
 import { APPLICATION_CONFIG } from "./config";
+import { resolveAuthConfig, AuthConfig } from "./auth";
 
 export class EntityStore {
 
     private connection : CallbackClient<typeof EntityManagerAPI>;
     private entities : Map<string, Entity>;
+    private authConfig!: AuthConfig;
     private accessToken: string | null = null;
     private tokenExpiry: number = 0;
     private refreshTimer: ReturnType<typeof setTimeout> | null = null;
@@ -17,21 +19,20 @@ export class EntityStore {
             baseUrl: APPLICATION_CONFIG.LATTICE_URL,
         }));
         this.entities = new Map();
-        
+
+        // Validate credentials up front so misconfiguration fails loudly.
+        this.authConfig = resolveAuthConfig(APPLICATION_CONFIG);
+
         this.getAccessToken()
-            .then(this.streamEntities)
+            .then(() => this.streamEntities())
             .catch(console.error);
     }
 
     private async getAccessToken(retryCount: number = 0): Promise<undefined> {
-        if (APPLICATION_CONFIG.BEARER_TOKEN) {
-            if (APPLICATION_CONFIG.CLIENT_ID || APPLICATION_CONFIG.CLIENT_SECRET) {
-                throw new Error("Bearer token auth (`BEARER_TOKEN`) and client config auth (`CLIENT_ID` + `CLIENT_SECRET`) cannot be used together. Use only one method of authentication. Learn more at https://developer.anduril.com/guides/getting-started/authenticate");
-            }
-        }
-
-        if (APPLICATION_CONFIG.BEARER_TOKEN) {
-            this.accessToken = APPLICATION_CONFIG.BEARER_TOKEN;
+        // A static bearer token is used as-is; there is no token exchange or
+        // refresh. See https://developer.anduril.com/guides/getting-started/authenticate
+        if (this.authConfig.mode === "bearer") {
+            this.accessToken = this.authConfig.token;
             return;
         }
 
@@ -155,9 +156,9 @@ export class EntityStore {
 
                         setTimeout(() => {
                             this.getAccessToken()
-                                .then(this.streamEntities)
+                                .then(() => this.streamEntities())
                                 .catch(error => console.error("Failed to reconnect:", error));
-                        }, 60000); 
+                        }, 60000);
                     }
                 },
                 // Request headers
