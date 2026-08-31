@@ -25,6 +25,18 @@ export type AuthConfig =
 
 const AUTH_DOCS = "https://developer.anduril.com/guides/getting-started/authenticate";
 
+/*
+    Error messages name the environment variables a user actually has to set,
+    not the keys of `AuthInputs`. Vite only exposes `VITE_`-prefixed vars to the
+    browser, so an error telling someone to set `BEARER_TOKEN` would send them
+    to a variable the app can never read.
+*/
+const ENV_VAR: Record<keyof AuthInputs, string> = {
+    BEARER_TOKEN: "VITE_LATTICE_BEARER_TOKEN",
+    CLIENT_ID: "VITE_LATTICE_CLIENT_ID",
+    CLIENT_SECRET: "VITE_LATTICE_CLIENT_SECRET",
+};
+
 export function resolveAuthConfig(config: AuthInputs): AuthConfig {
     const hasBearer = Boolean(config.BEARER_TOKEN);
     const hasClientId = Boolean(config.CLIENT_ID);
@@ -32,8 +44,8 @@ export function resolveAuthConfig(config: AuthInputs): AuthConfig {
 
     if (hasBearer && (hasClientId || hasClientSecret)) {
         throw new Error(
-            `Bearer token auth (\`BEARER_TOKEN\`) and client credentials auth ` +
-                `(\`CLIENT_ID\` + \`CLIENT_SECRET\`) cannot be used together. ` +
+            `Bearer token auth (\`${ENV_VAR.BEARER_TOKEN}\`) and client credentials auth ` +
+                `(\`${ENV_VAR.CLIENT_ID}\` + \`${ENV_VAR.CLIENT_SECRET}\`) cannot be used together. ` +
                 `Use only one method of authentication. Learn more at ${AUTH_DOCS}`,
         );
     }
@@ -45,15 +57,16 @@ export function resolveAuthConfig(config: AuthInputs): AuthConfig {
     if (hasClientId || hasClientSecret) {
         if (!hasClientId || !hasClientSecret) {
             throw new Error(
-                `Client credentials auth requires both \`CLIENT_ID\` and ` +
-                    `\`CLIENT_SECRET\`. Learn more at ${AUTH_DOCS}`,
+                `Client credentials auth requires both \`${ENV_VAR.CLIENT_ID}\` and ` +
+                    `\`${ENV_VAR.CLIENT_SECRET}\`. Learn more at ${AUTH_DOCS}`,
             );
         }
         return { mode: "client_credentials" };
     }
 
     throw new Error(
-        `No authentication configured. Set \`BEARER_TOKEN\`, or \`CLIENT_ID\` ` +
-            `and \`CLIENT_SECRET\`. Learn more at ${AUTH_DOCS}`,
+        `No authentication configured. Set \`${ENV_VAR.BEARER_TOKEN}\`, or ` +
+            `\`${ENV_VAR.CLIENT_ID}\` and \`${ENV_VAR.CLIENT_SECRET}\`. ` +
+            `Learn more at ${AUTH_DOCS}`,
     );
 }
