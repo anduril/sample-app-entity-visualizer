@@ -4,7 +4,7 @@
 
 ## Description
 
-This web application implements a custom UI with JavaScript + [Vite](https://vite.dev/) that leverages the Lattice SDK's gRPC streaming capabilities. It uses the JavaScript types generated in the [Lattice SDK Buf Repository] alongside ConnectRPC to update simulated Entity positions on a map in real-time. 
+This web application implements a custom UI with JavaScript + [Vite](https://vite.dev/) that leverages the Lattice SDK's gRPC streaming capabilities. It uses the JavaScript types generated in the [Lattice SDK Buf Repository](https://buf.build/anduril/lattice-sdk) alongside ConnectRPC to update simulated Entity positions on a map in real-time. 
 
 The project uses the following dependencies:
 * `Connect RPC` - To make the gRPC+Web requests
@@ -37,10 +37,10 @@ VITE_LATTICE_BEARER_TOKEN="" # Set this or `VITE_LATTICE_CLIENT_ID` and `VITE_LA
 VITE_LATTICE_CLIENT_ID="" # Do not set `VITE_LATTICE_BEARER_TOKEN` if using client credentials
 VITE_LATTICE_CLIENT_SECRET="" # Do not set `VITE_LATTICE_BEARER_TOKEN` if using client credentials
 VITE_LATTICE_SANDBOX_TOKEN="" # Set when connecting to a Lattice Sandbox environment. Not required when connecting to other Lattice environments
-VITE_LATTICE_URL=""
+VITE_LATTICE_URL="lattice-<sandbox_ID>.env.sandboxes.developer.anduril.com" # Your environment's Resource Endpoint
 ```
 
-For information on how to obtain these credentials, see the [Sandboxes documentation](https://developer.anduril.com/guides/getting-started/sandboxes#get-the-tokens).
+For information on how to create an environment and obtain these credentials, see the [Sandboxes documentation](https://developer.anduril.com/guides/developer-tools/sandboxes).
 
 Please contact your Anduril representative if you need assistance with populating these values or run into any authentication issues.
 
