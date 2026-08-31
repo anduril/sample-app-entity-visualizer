@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "vitest run"
   },
   "dependencies": {
     "@buf/anduril_lattice-sdk.bufbuild_es": "^2.14.0-20260812211922-3f7e94c82c6d.1",
@@ -36,6 +37,7 @@
     "globals": "^15.12.0",
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.57.1",
-    "vite": "^6.4.1"
+    "vite": "^6.4.1",
+    "vitest": "^3.2.7"
   }
 }

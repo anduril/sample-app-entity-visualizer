@@ -3,30 +3,59 @@ import { createGrpcWebTransport } from "@connectrpc/connect-web";
 import { CallbackClient, createCallbackClient } from "@connectrpc/connect";
 import { Entity } from "@buf/anduril_lattice-sdk.bufbuild_es/anduril/entitymanager/v1/entity.pub_pb";
 import { APPLICATION_CONFIG } from "./config";
+import { resolveAuthConfig, AuthConfig } from "./auth";
 
 export class EntityStore {
 
     private connection : CallbackClient<typeof EntityManagerAPI>;
     private entities : Map<string, Entity>;
+    private authConfig: AuthConfig | null = null;
     private accessToken: string | null = null;
     private tokenExpiry: number = 0;
     private refreshTimer: ReturnType<typeof setTimeout> | null = null;
+    private error: string | null = null;
 
     constructor() {
         this.connection = createCallbackClient(EntityManagerAPI, createGrpcWebTransport({
             baseUrl: APPLICATION_CONFIG.LATTICE_URL,
         }));
         this.entities = new Map();
-        this.getAccessToken().then(() => {
-            this.streamEntities();
-        }).catch(error => {
-            console.error("Failed to get access token:", error);
-        });
+
+        // Validate credentials up front. Rather than throwing out of the
+        // constructor (which would crash the whole React app), we record the
+        // problem so the UI can surface it as a banner. See getError().
+        try {
+            this.authConfig = resolveAuthConfig(APPLICATION_CONFIG);
+        } catch (error) {
+            this.setError(error);
+            return;
+        }
+
+        this.getAccessToken()
+            .then(() => this.streamEntities())
+            .catch((error) => this.setError(error));
     }
 
-    private async getAccessToken(retryCount: number = 0): Promise<string> {
+    private setError(error: unknown): void {
+        this.error = error instanceof Error ? error.message : String(error);
+        console.error(this.error);
+    }
+
+    /** The most recent unrecoverable error, or null if the store is healthy. */
+    getError(): string | null {
+        return this.error;
+    }
+
+    private async getAccessToken(retryCount: number = 0): Promise<undefined> {
+        // A static bearer token is used as-is; there is no token exchange or
+        // refresh. See https://developer.anduril.com/guides/getting-started/authenticate
+        if (this.authConfig?.mode === "bearer") {
+            this.accessToken = this.authConfig.token;
+            return;
+        }
+
         if (this.accessToken && Date.now() < this.tokenExpiry) {
-            return this.accessToken;
+            return;
         }
 
         try {
@@ -56,8 +85,6 @@ export class EntityStore {
             this.tokenExpiry = Date.now() + (expirySeconds * 1000);
 
             this.scheduleTokenRefresh();
-
-            return this.accessToken ? this.accessToken : "";
         } catch (error) {
             console.error(`Error obtaining access token (attempt ${retryCount + 1}):`, error);
 
@@ -98,9 +125,7 @@ export class EntityStore {
         try {
             const headers = new Headers();
 
-            // Get fresh access token
-            const token = await this.getAccessToken();
-            headers.set("authorization", `Bearer ${token}`);
+            headers.set("authorization", `Bearer ${this.accessToken}`);
             headers.set("anduril-sandbox-authorization", `Bearer ${APPLICATION_CONFIG.SANDBOX_TOKEN}`);
 
             /*
@@ -108,7 +133,9 @@ export class EntityStore {
                 https://docs.anduril.com/guide/entity/watch#stream-entities for additional information
                 on streaming entities
             */
-            this.connection.streamEntityComponents({ includeAllComponents: true},
+            this.connection.streamEntityComponents(
+                // Request options
+                { includeAllComponents: true},
                 // Success callback
                 (res : StreamEntityComponentsResponse) => {
                     const entity = res.entityEvent?.entity;
@@ -129,7 +156,7 @@ export class EntityStore {
                             this.entities.delete(entity.entityId);
                     }
                 },
-
+                // Error callback
                 async (err) => {
                     console.error("Stream error:", err);
 
@@ -149,9 +176,10 @@ export class EntityStore {
                             this.getAccessToken()
                                 .then(() => this.streamEntities())
                                 .catch(error => console.error("Failed to reconnect:", error));
-                        }, 60000); 
+                        }, 60000);
                     }
                 },
+                // Request headers
                 { headers: headers }
             );
         } catch (error) {
