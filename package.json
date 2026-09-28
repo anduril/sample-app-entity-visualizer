@@ -11,7 +11,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@buf/anduril_lattice-sdk.bufbuild_es": "^2.15.0-20260911022012-623b4f62e5de.1",
+    "@buf/anduril_lattice-sdk.bufbuild_es": "^2.15.0-20260927225940-7547a61b1e5a.1",
     "@connectrpc/connect": "^2.1.1",
     "@connectrpc/connect-web": "^2.1.1",
     "@emotion/react": "^11.14.0",
