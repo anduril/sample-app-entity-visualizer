@@ -3,6 +3,8 @@ import "leaflet/dist/leaflet.css";
 import "react-leaflet-markercluster/styles";
 
 import { EntityStore } from "./EntityStore";
+import { resolveAuthConfig } from "./auth";
+import { APPLICATION_CONFIG } from "./config";
 
 import { Entity } from "@buf/anduril_lattice-sdk.bufbuild_es/anduril/entitymanager/v1/entity.pub_pb";
 import { useEffect, useState } from "react";
@@ -10,16 +12,22 @@ import { EntityMap } from "./components/EntityMap";
 import { Alert, Box, Container, Typography } from "@mui/material";
 import { DownloadLink } from "./components/DownloadLink";
 
+function configError(): string | null {
+  try {
+    resolveAuthConfig(APPLICATION_CONFIG);
+    return null;
+  } catch (error) {
+    return error instanceof Error ? error.message : String(error);
+  }
+}
+
 function App() {
   const [entities, setEntities] = useState<Entity[]>([]);
-  const [error, setError] = useState<string | null>(null);
+  // Config errors show on first render; connection errors arrive with the interval.
+  const [error, setError] = useState<string | null>(configError);
 
   useEffect(() => {
     const store = new EntityStore();
-
-    // Surface a config/connection error immediately, then keep both the
-    // entities and any error in sync on an interval.
-    setError(store.getError());
 
     const interval = setInterval(() => {
       setEntities([...store.getAllEntities().values()]);

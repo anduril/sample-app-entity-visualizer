@@ -10,6 +10,7 @@ export default defineConfig(({ mode }) => {
   proxy[`/${baseUrl}`] = {
     target: `https://${baseUrl}`,
     changeOrigin: true,
+    headers: { origin: `https://${baseUrl}` },
     rewrite: (path) => path.replace(`${baseUrl}`, ''),
   }
 
