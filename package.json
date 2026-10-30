@@ -12,8 +12,8 @@
   },
   "dependencies": {
     "@buf/anduril_lattice-sdk.bufbuild_es": "^2.16.0-20261020021547-5d9b5a792f12.1",
-    "@connectrpc/connect": "^2.1.1",
-    "@connectrpc/connect-web": "^2.2.0",
+    "@connectrpc/connect": "^2.3.0",
+    "@connectrpc/connect-web": "^2.3.0",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
     "@mui/icons-material": "^9.5.0",
